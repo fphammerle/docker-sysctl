@@ -1,0 +1,23 @@
+version: '2.2'
+
+services:
+  sysctl:
+    build: .
+    image: fphammerle/sysctl
+    environment:
+      # example: setup netns to run "unprivileged" kube-proxy in
+      # https://github.com/kubernetes/kubernetes/blob/v1.17.0/pkg/proxy/iptables/proxier.go#L269
+      SYSCTL_ARGS: >-
+        net.ipv4.conf.all.route_localnet=1
+        net.netfilter.nf_conntrack_tcp_timeout_established=86400
+        net.netfilter.nf_conntrack_tcp_timeout_close_wait=3600
+      SLEEP_INTERVAL: infinite
+      #SLEEP_INTERVAL: 0s
+    userns_mode: host
+    privileged: true
+    restart: unless-stopped
+    # enough to install packages for debugging
+    mem_limit: 64M
+    cpus: 0.5
+
+# https://docs.docker.com/compose/compose-file/compose-file-v2/
